@@ -1,4 +1,3 @@
-from flask import Flask
 from flask import Flask, flash, redirect, render_template, request, session, abort
 from flask_mysqldb import MySQL
 import os
@@ -11,8 +10,6 @@ app.config['MYSQL_PASSWORD'] = ''
 app.config['MYSQL_DB'] = 'flask'
  
 mysql = MySQL(app)
-
-
 
 @app.route('/')
 def index():
@@ -30,7 +27,7 @@ def signup():
         cursor.execute(''' INSERT INTO user_logins VALUES(%s,%s)''',(username, password,))
         mysql.connection.commit()
         cursor.close()
-        return render_template('index.html')
+        return index()
 
 @app.route('/login', methods=['GET','POST'])
 def login():
@@ -42,17 +39,17 @@ def login():
         cursor = mysql.connection.cursor()
         cursor.execute("SELECT password FROM user_logins WHERE username=%s", (username,))
         right_password = cursor.fetchone()
-        if right_password is None:
-            pass
-        else:
+        if right_password is not None:
             right_password = right_password[0]
             if password == right_password:
                 session['logged_in'] = True
             else:
                 print("wrong Password!")
+        else:
+            print("wrong Username!")
         mysql.connection.commit()
         cursor.close()
-        return render_template('index.html')
+        return index()
         
 @app.route("/logout")
 def logout():
