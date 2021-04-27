@@ -23,11 +23,17 @@ def signup():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        cursor = mysql.connection.cursor()
-        cursor.execute(''' INSERT INTO user_logins VALUES(%s,%s)''',(username, password,))
-        mysql.connection.commit()
-        cursor.close()
-        return index()
+        password2 = request.form['password2']
+        if password == password2:
+            cursor = mysql.connection.cursor()
+            cursor.execute(''' INSERT INTO user_logins VALUES(%s,%s)''',(username, password,))
+            mysql.connection.commit()
+            cursor.close()
+            return index()
+        else:
+            return redirect("/signup")
+
+
 
 @app.route('/login', methods=['GET','POST'])
 def login():
