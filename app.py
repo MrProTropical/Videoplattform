@@ -29,7 +29,7 @@ def signup():
             cursor.execute(''' INSERT INTO user_logins VALUES(%s,%s)''',(username, password,))
             mysql.connection.commit()
             cursor.close()
-            return index()
+            return redirect("/")
         else:
             return redirect("/signup")
 
@@ -56,12 +56,12 @@ def login():
             print("wrong Username!")
         mysql.connection.commit()
         cursor.close()
-        return index()
+        return redirect("/")
         
 @app.route("/logout")
 def logout():
     session['logged_in'] = False
-    return index()
+    return redirect("/")
 
 
 if __name__ == '__main__':
