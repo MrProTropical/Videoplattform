@@ -43,6 +43,7 @@ def login():
             right_password = right_password[0]
             if password == right_password:
                 session['logged_in'] = True
+                print("right Password")
             else:
                 print("wrong Password!")
         else:
