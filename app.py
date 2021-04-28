@@ -13,7 +13,7 @@ mysql = MySQL(app)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', token="Hello Flask+Reakt")
 
 
 @app.route('/signup', methods=['GET','POST'])
