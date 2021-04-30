@@ -3,16 +3,21 @@ from flask_mysqldb import MySQL
 import os
 
 app = Flask(__name__)
+app.secret_key = os.urandom(21)
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
 app.config['MYSQL_DB'] = 'flask'
- 
+
 mysql = MySQL(app)
 
 @app.route('/')
 def index():
+    if "logged_in" in session:
+        if not session["logged_in"] is None:
+            if session["logged_in"] == True:
+                return render_template('index.html', username = session['username'])
     return render_template('index.html')
 
 
@@ -48,7 +53,8 @@ def login():
         if right_password is not None:
             right_password = right_password[0]
             if password == right_password:
-                session['logged_in'] = True
+                session["logged_in"] = True
+                session["username"] = username
                 print("right Password")
             else:
                 print("wrong Password!")
@@ -60,10 +66,9 @@ def login():
         
 @app.route("/logout")
 def logout():
-    session['logged_in'] = False
+    session["logged_in"] = False
     return redirect("/")
 
 
 if __name__ == '__main__':
-    app.secret_key = os.urandom(21)
     app.run(debug=True, host='0.0.0.0')
