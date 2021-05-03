@@ -1,0 +1,21 @@
+<html>
+<head>
+<link rel="stylesheet" href='/static/style.css' />
+</head>
+<body>
+    <h1>My website</h1>
+    <br>
+    <p id="name">Hello </p>
+    <br>
+    {% block content %}
+    {% endblock %}
+    <br>
+    <a href="/login">login</a><br>
+    <a href="/signup">signup</a><br>
+    <a href="/logout">logout</a><br>
+    <script>
+        var username = "{{ username }}"
+        document.getElementById("name").innerHTML += username
+    </script>
+</body>
+</html>

@@ -20,7 +20,6 @@ def index():
                 return render_template('index.html', username = session['username'])
     return render_template('index.html')
 
-
 @app.route('/signup', methods=['GET','POST'])
 def signup():
     if request.method == 'GET':
