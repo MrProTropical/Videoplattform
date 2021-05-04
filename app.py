@@ -1,5 +1,6 @@
 from flask import Flask, flash, redirect, render_template, request, session, abort
 from flask_mysqldb import MySQL
+from werkzeug.utils import secure_filename
 import os
 
 app = Flask(__name__)
@@ -9,8 +10,22 @@ app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
 app.config['MYSQL_DB'] = 'flask'
+app.config["FILE_UPLOADS_PATH"] = 'uploads'
+app.config["ALLOWED_FILE_EXTENSIONS"] = ["TXT", "JPEG", "JPG", "PNG", "GIF"]
 
 mysql = MySQL(app)
+
+def allowed_files(filename):
+
+    if not "." in filename:
+        return False
+
+    extension = filename.rsplit(".", 1)[1]
+
+    if extension.upper() in app.config["ALLOWED_FILE_EXTENSIONS"]:
+        return True
+    else:
+        return False
 
 @app.route('/')
 def index():
@@ -19,6 +34,22 @@ def index():
             if session["logged_in"] == True:
                 return render_template('index.html', username = session['username'])
     return render_template('index.html')
+
+@app.route('/upload', methods=['Get','POST'])
+def upload():
+    if request.method == 'GET':
+        return render_template('upload.html')
+    if request.method == 'POST':
+        if request.files:
+            uploadedfile = request.files["datei"]
+            if uploadedfile.filename == "":
+                print("No filename")
+            else:
+                if allowed_files(uploadedfile.filename):
+                    filename = secure_filename(uploadedfile.filename)
+                    if filename:
+                        uploadedfile.save(os.path.join(app.config["FILE_UPLOADS_PATH"], filename))
+        return redirect("/")
 
 @app.route('/signup', methods=['GET','POST'])
 def signup():
