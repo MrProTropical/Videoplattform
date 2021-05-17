@@ -2,6 +2,7 @@ from flask import Flask, flash, redirect, render_template, request, session, abo
 from flask_mysqldb import MySQL
 from werkzeug.utils import secure_filename
 import os
+import re
 
 app = Flask(__name__)
 app.secret_key = os.urandom(21)
@@ -57,6 +58,7 @@ def signup():
         return render_template('signup.html')
     if request.method == 'POST':
         username = request.form['username']
+        email = request.form["email"]
         password = request.form['password']
         password2 = request.form['password2']
         if password == password2:
@@ -67,7 +69,15 @@ def signup():
             return redirect("/")
         else:
             return redirect("/signup")
-
+            
+def validateEmail(email):
+    return re.match(r"[\w-]{1,20}@\w{2,20}\.\w{2,3}$", email)
+email = "hanswurst@gmail.com"
+valid = validateEmail(email)
+if valid:
+    print(email, "is correct")
+else:
+    print("invalid email format:", email)
 
 
 @app.route('/login', methods=['GET','POST'])
