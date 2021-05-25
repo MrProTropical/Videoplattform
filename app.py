@@ -28,6 +28,9 @@ def allowed_files(filename):
     else:
         return False
 
+def validateEmail(email):
+    return re.match(r"[\w-]{1,20}@\w{2,20}\.\w{2,3}$", email)
+
 @app.route('/')
 def index():
     if "logged_in" in session:
@@ -61,24 +64,14 @@ def signup():
         email = request.form["email"]
         password = request.form['password']
         password2 = request.form['password2']
-        if password == password2:
+        if password == password2 and validateEmail(email): # validateEmail(email) konnte nicht getestet werden, da in html bereits überprüft wird
             cursor = mysql.connection.cursor()
-            cursor.execute(''' INSERT INTO user_logins VALUES(%s,%s)''',(username, password,))
+            cursor.execute(''' INSERT INTO user_logins VALUES(%s,%s,%s)''',(username, email, password,))
             mysql.connection.commit()
             cursor.close()
             return redirect("/")
         else:
             return redirect("/signup")
-            
-def validateEmail(email):
-    return re.match(r"[\w-]{1,20}@\w{2,20}\.\w{2,3}$", email)
-email = "hanswurst@gmail.com"
-valid = validateEmail(email)
-if valid:
-    print(email, "is correct")
-else:
-    print("invalid email format:", email)
-
 
 @app.route('/login', methods=['GET','POST'])
 def login():
