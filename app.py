@@ -12,21 +12,11 @@ app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
 app.config['MYSQL_DB'] = 'flask'
 app.config["FILE_UPLOADS_PATH"] = 'uploads'
-app.config["ALLOWED_FILE_EXTENSIONS"] = ["TXT", "JPEG", "JPG", "PNG", "GIF"]
+app.config["ALLOWED_FILE_EXTENSIONS"] = [".JPEG", ".JPG", ".PNG", ".GIF"]
+
+next_filename = 0
 
 mysql = MySQL(app)
-
-def allowed_files(filename):
-
-    if not "." in filename:
-        return False
-
-    extension = filename.rsplit(".", 1)[1]
-
-    if extension.upper() in app.config["ALLOWED_FILE_EXTENSIONS"]:
-        return True
-    else:
-        return False
 
 def validateEmail(email):
     return re.match(r"[\w-]{1,20}@\w{2,20}\.\w{2,3}$", email)
@@ -44,14 +34,21 @@ def upload():
     if request.method == 'GET':
         return render_template('upload.html')
     if request.method == 'POST':
+        global next_filename
         if request.files:
             uploadedfile = request.files["datei"]
-            if uploadedfile.filename == "":
-                print("No filename")
+            filename = uploadedfile.filename
+            if filename == "":
+                print("No filename!")
             else:
-                if allowed_files(uploadedfile.filename):
-                    filename = secure_filename(uploadedfile.filename)
-                    if filename:
+                if "." in filename:
+                    extension = filename.rsplit(".", 1)[1]
+                    extension = "." + extension.upper()
+                    if extension in app.config["ALLOWED_FILE_EXTENSIONS"]:
+                        while os.path.isfile('uploads/' + str(next_filename) + app.config["ALLOWED_FILE_EXTENSIONS"][0]) or os.path.isfile('uploads/' + str(next_filename) + app.config["ALLOWED_FILE_EXTENSIONS"][1]) or os.path.isfile('uploads/' + str(next_filename) + app.config["ALLOWED_FILE_EXTENSIONS"][2]) or os.path.isfile('uploads/' + str(next_filename) + app.config["ALLOWED_FILE_EXTENSIONS"][3]): #not very good code
+                            next_filename += 1
+                            print(next_filename)
+                        filename = str(next_filename) + extension
                         uploadedfile.save(os.path.join(app.config["FILE_UPLOADS_PATH"], filename))
         return redirect("/")
 
