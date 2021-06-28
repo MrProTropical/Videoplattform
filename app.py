@@ -1,6 +1,5 @@
 from flask import Flask, flash, redirect, render_template, request, session, abort
 from flask_mysqldb import MySQL
-from werkzeug.utils import secure_filename
 import os
 import re
 
@@ -11,10 +10,13 @@ app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
 app.config['MYSQL_DB'] = 'flask'
-app.config["FILE_UPLOADS_PATH"] = 'uploads'
+app.config["FILE_UPLOADS_PATH"] = '/static/uploads/'
 app.config["ALLOWED_FILE_EXTENSIONS"] = [".JPEG", ".JPG", ".PNG", ".GIF"]
 
 next_filename = 0
+
+while os.path.isfile(app.config["FILE_UPLOADS_PATH"] + str(next_filename) + app.config["ALLOWED_FILE_EXTENSIONS"][0]) or os.path.isfile('uploads/' + str(next_filename) + app.config["ALLOWED_FILE_EXTENSIONS"][1]) or os.path.isfile('uploads/' + str(next_filename) + app.config["ALLOWED_FILE_EXTENSIONS"][2]) or os.path.isfile('uploads/' + str(next_filename) + app.config["ALLOWED_FILE_EXTENSIONS"][3]): #not very good code in this line
+    next_filename += 1
 
 mysql = MySQL(app)
 
@@ -27,7 +29,7 @@ def index():
         if not session["logged_in"] is None:
             if session["logged_in"] == True:
                 return render_template('index.html', username = session['username'])
-    return render_template('index.html')
+    return render_template('index.html', filename = app.config["FILE_UPLOADS_PATH"] + str(next_filename) + ".JPG") #not final code
 
 @app.route('/upload', methods=['Get','POST'])
 def upload():
@@ -45,9 +47,8 @@ def upload():
                     extension = filename.rsplit(".", 1)[1]
                     extension = "." + extension.upper()
                     if extension in app.config["ALLOWED_FILE_EXTENSIONS"]:
-                        while os.path.isfile('uploads/' + str(next_filename) + app.config["ALLOWED_FILE_EXTENSIONS"][0]) or os.path.isfile('uploads/' + str(next_filename) + app.config["ALLOWED_FILE_EXTENSIONS"][1]) or os.path.isfile('uploads/' + str(next_filename) + app.config["ALLOWED_FILE_EXTENSIONS"][2]) or os.path.isfile('uploads/' + str(next_filename) + app.config["ALLOWED_FILE_EXTENSIONS"][3]): #not very good code
+                        while os.path.isfile(app.config["FILE_UPLOADS_PATH"] + str(next_filename) + app.config["ALLOWED_FILE_EXTENSIONS"][0]) or os.path.isfile('uploads/' + str(next_filename) + app.config["ALLOWED_FILE_EXTENSIONS"][1]) or os.path.isfile('uploads/' + str(next_filename) + app.config["ALLOWED_FILE_EXTENSIONS"][2]) or os.path.isfile('uploads/' + str(next_filename) + app.config["ALLOWED_FILE_EXTENSIONS"][3]): #not very good code in this line
                             next_filename += 1
-                            print(next_filename)
                         filename = str(next_filename) + extension
                         uploadedfile.save(os.path.join(app.config["FILE_UPLOADS_PATH"], filename))
         return redirect("/")
