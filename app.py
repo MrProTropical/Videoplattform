@@ -2,6 +2,9 @@ from flask import Flask, flash, redirect, render_template, request, session, abo
 from flask_mysqldb import MySQL
 import os
 import re
+import logging
+
+logging.basicConfig(filename='program.log', level=logging.DEBUG, format = '%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s')
 
 app = Flask(__name__)
 app.secret_key = os.urandom(21)
